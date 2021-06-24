@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserDto } from 'src/common/dto/user.dto';
+import { UndefinedToNullInterceptor } from 'src/common/interceptors/undefinedToNull.interceptor';
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UsersService } from './users.service';
 
+// 이 인터셉터를 장착한 class 의 모든 api 는 이제부터 이 인터셉터의 영향을 받는다.
+@UseInterceptors(UndefinedToNullInterceptor) // 만든 intersecptor 장착 하기
 @ApiTags('USER')
 @Controller('api/users')
 export class UsersController {
@@ -18,6 +21,7 @@ export class UsersController {
     return user;
   }
 
+  // @UseInterceptors(UndefinedToNullInterceptor) 개별적으로 라우터에만 적용 할 수 도 있음!
   @ApiOperation({ summary: '회원가입' })
   @Post() // Post /users/
   postUsers(@Body() data: JoinRequestDto) {}
