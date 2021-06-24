@@ -6,9 +6,10 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { UsersModule } from './users/users.module';
 import { DmsModule } from './dms/dms.module';
 import { ChannelsModule } from './channels/channels.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({}), UsersModule, DmsModule, ChannelsModule], // module 을 불러왔으면 추가를 해줘야함
+  imports: [ConfigModule.forRoot({}), UsersModule, DmsModule, ChannelsModule, WorkspacesModule], // module 을 불러왔으면 추가를 해줘야함
   controllers: [AppController],
   providers: [AppService],
 })
