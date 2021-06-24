@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { User } from 'src/common/decorators/user.decorator';
 import { UserDto } from 'src/common/dto/user.dto';
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UsersService } from './users.service';
@@ -13,7 +14,9 @@ export class UsersController {
     type: UserDto,
   })
   @Get() // Get /users/
-  getUsers() {}
+  getUsers(@User() user) {
+    return user;
+  }
 
   @ApiOperation({ summary: '회원가입' })
   @Post() // Post /users/
@@ -22,11 +25,12 @@ export class UsersController {
   @ApiOperation({ summary: 'login' })
   @ApiResponse({
     type: UserDto,
-    description: 'success',
     status: 200,
   })
   @Post('login') // Post /users/login/
-  login() {}
+  login(@User() user) {
+    return user;
+  }
 
   @ApiOperation({ summary: 'logout' })
   @Post('logout') // Post /users/logout/
