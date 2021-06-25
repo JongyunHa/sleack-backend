@@ -7,9 +7,20 @@ import { UsersModule } from './users/users.module';
 import { DmsModule } from './dms/dms.module';
 import { ChannelsModule } from './channels/channels.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import * as ormconfig from 'ormconfig';
 
 @Module({
-  imports: [ConfigModule.forRoot({}), UsersModule, DmsModule, ChannelsModule, WorkspacesModule], // module 을 불러왔으면 추가를 해줘야함
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    UsersModule,
+    DmsModule,
+    ChannelsModule,
+    WorkspacesModule,
+    TypeOrmModule.forRoot(ormconfig),
+  ], // module 을 불러왔으면 추가를 해줘야함
   controllers: [AppController],
   providers: [AppService],
 })
