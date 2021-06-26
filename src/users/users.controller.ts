@@ -24,7 +24,9 @@ export class UsersController {
   // @UseInterceptors(UndefinedToNullInterceptor) 개별적으로 라우터에만 적용 할 수 도 있음!
   @ApiOperation({ summary: '회원가입' })
   @Post() // Post /users/
-  postUsers(@Body() data: JoinRequestDto) {}
+  join(@Body() body: JoinRequestDto) {
+    this.usersService.join(body.email, body.nickname, body.password);
+  }
 
   @ApiOperation({ summary: 'login' })
   @ApiResponse({
