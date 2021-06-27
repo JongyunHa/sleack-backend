@@ -11,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { ChannelChats } from './ChannelChats';
 import { ChannelMembers } from './ChannelMembers';
 import { Channels } from './Channels';
@@ -34,6 +35,8 @@ export class Users {
     description: 'user email',
   })
   @Column('varchar', { name: 'email', unique: true, length: 30 })
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @ApiProperty({
@@ -41,6 +44,7 @@ export class Users {
     description: 'user nickname',
   })
   @Column('varchar', { name: 'nickname', length: 30 })
+  @IsString()
   nickname: string;
 
   @ApiProperty({
@@ -48,7 +52,10 @@ export class Users {
     description: 'user password',
   })
   @Column('varchar', { name: 'password', length: 100, select: false })
+  @IsString()
+  @IsNotEmpty()
   password: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
