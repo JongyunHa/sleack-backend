@@ -9,6 +9,7 @@ import { ChannelsModule } from './channels/channels.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as ormconfig from 'ormconfig';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import * as ormconfig from 'ormconfig';
     ChannelsModule,
     WorkspacesModule,
     TypeOrmModule.forRoot(ormconfig),
+    AuthModule,
   ], // module 을 불러왔으면 추가를 해줘야함
   controllers: [AppController],
   providers: [AppService],
