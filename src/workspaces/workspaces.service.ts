@@ -5,7 +5,7 @@ import { Channels } from 'src/entities/Channels';
 import { Users } from 'src/entities/Users';
 import { WorkspaceMembers } from 'src/entities/WorkspaceMembers';
 import { Workspaces } from 'src/entities/Workspaces';
-import { Repository } from 'typeorm';
+import { Repository, Transaction, TransactionRepository } from 'typeorm';
 
 @Injectable()
 export class WorkspacesService {
@@ -32,5 +32,55 @@ export class WorkspacesService {
         WorkspaceMembers: [{ UserId: myId }],
       },
     });
+  }
+
+  @Transaction()
+  async createWorkspace(
+    @TransactionRepository(Workspaces)
+    workspacesRepository: Repository<Workspaces>,
+    @TransactionRepository(WorkspaceMembers)
+    workspaceMembersRepository: Repository<WorkspaceMembers>,
+    @TransactionRepository(Channels)
+    channelsRepository: Repository<Channels>,
+    @TransactionRepository(ChannelMembers)
+    channelMembersRepository: Repository<ChannelMembers>,
+    name: string,
+    url: string,
+    myId: number,
+  ) {
+    const workspace = workspacesRepository.create({
+      name,
+      url,
+      OwnerId: myId,
+    });
+
+    const returned = await workspacesRepository.save(workspace);
+
+    const workspaceMember = workspaceMembersRepository.create({
+      UserId: myId,
+      WorkspaceId: returned.id,
+    });
+
+    const channel = channelsRepository.create({
+      name: '일반',
+      WorkspaceId: returned.id,
+    });
+    const [, channelReturned] = await Promise.all([
+      workspaceMembersRepository.save(workspaceMember),
+      channelsRepository.save(channel),
+    ]);
+    const channelMember = channelMembersRepository.create({
+      UserId: myId,
+      ChannelId: channelReturned.id,
+    });
+    await this.channelMembersRepository.save(channelMember);
+  }
+
+  async getWorkspaceMembers(url: string) {
+    return await this.usersRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.WorkspaceMembers', 'm')
+      .innerJoin('m.Workspace', 'w', 'w.url = :url', { url })
+      .getMany();
   }
 }
