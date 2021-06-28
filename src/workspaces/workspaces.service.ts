@@ -83,4 +83,43 @@ export class WorkspacesService {
       .innerJoin('m.Workspace', 'w', 'w.url = :url', { url })
       .getMany();
   }
+
+  async createWorkspaceMembers(url, email) {
+    const workspace = await this.workspacesRepository.findOne({
+      where: { url },
+      // relation: ['Channels'],
+      join: {
+        alias: 'workspace',
+        // innerJoin 는 보통  join 한 테이블의 정보를 가져오지 않는다.
+        // 그래서 정보를 모두 가져오기위해서 innerJoinAndSelect 를 사용함.
+        innerJoinAndSelect: {
+          channels: 'workspace.Channels',
+        },
+      },
+    });
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) {
+      return null;
+    }
+    const workspaceMember = new WorkspaceMembers();
+    workspaceMember.WorkspaceId = workspace.id;
+    workspaceMember.UserId = user.id;
+    await this.workspaceMembersRepository.save(workspaceMember);
+    const channelMember = new ChannelMembers();
+    channelMember.ChannelId = workspace.Channels.find(
+      (v) => v.name === '일반',
+    ).id;
+    channelMember.UserId = user.id;
+    await this.channelMembersRepository.save(channelMember);
+  }
+
+  async getWorkspaceMember(url: string, id: number) {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .innerJoin('user.Workspaces', 'workspaces', 'workspaces.url = :url', {
+        url,
+      })
+      .getOne();
+  }
 }
